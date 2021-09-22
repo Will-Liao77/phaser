@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Title Here</title>
+    <script src="phaser.min.js">  
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/sceneMain.js"></script>
+</head>
+<body>
+    <script>
+    var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+
+            physics: {
+                default:'arcade',
+                arcade:{
+                    gravity:{y:300},
+                    debug:false
+                }
+            },
+
+            scene: {
+                preload : preload,
+                create : create,
+                update : update
+            }
+        };
+
+    var game = new Phaser.Game(config);
+
+    function preload(){
+        this.load.image('sky','assets/sky.png');
+        this.load.audio('bgMusic',['assets/background.mp3','assets/background.ogg']);
+        this.load.image('ground','assets/platform.png');
+        this.load.image('star','assets/star.png');
+        this.load.image('bomb','assets/bomb.png');
+
+        this.load.spritesheet('alien','assets/dude.png',{frameWidth:32,frameHeight:48});
+    }
+
+    function create(){
+        this.add.image(400,300,'sky');
+        var music = this.sound.add('bgMusic',{volume:0.6,loop:true});
+        music.play();
+
+        platforms = this.physics.add.staticGroup();
+        //part 2.2 加入平台上的物品
+        //platforms.create(x座標, y座標, key, frame, visible, active)
+        //底
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        //三個跳台
+        platforms.create(600, 400, 'ground');
+        platforms.create(50, 250, 'ground');
+        platforms.create(750, 150, 'ground');
+
+        //part 3 加入主要腳色
+        player = this.physics.add.sprite(100,450,"alien");
+
+        //part 3.1 讓他是活在"有重力的環境下"
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true); 
+        
+        //讓平台與主角有物理意義
+        this.physics.add.collider(player,platforms);
+
+        this.anims.create({
+            key:'left',
+            frames: this.anims.generateFrameNumbers('alien',{start:0,end:3}),
+            frameRate:10,
+            repeat:-1
+        });
+
+        this.anims.create({
+            key:'right',
+            frames: this.anims.generateFrameNumbers('alien',{start:5,end:8}),
+            frameRate:10,
+            repeat:-1
+        });
+
+        this.anims.create({
+            key:'turn',
+            frames: [{key:'alien',frame:4}],
+            frameRate:20
+        });
+
+        cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    function update(){
+        if(cursors.right.isDown){
+            player.setVelocityX(150);
+            player.anims.play('right',true);
+        }else if(cursors.left.isDown){
+            player.setVelocityX(-150);
+            player.anims.play('left',true);
+        }else{
+            player.setVelocityX(0);
+            player.anims.play('turn');
+        }
+
+        if(cursors.up.isDown && player.body.touching.down){
+            player.setVelocityY(-350);
+            
+        }
+    }
+    </script>
+</body>
+</html>
