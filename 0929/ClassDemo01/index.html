@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo 1 - Get the stars</title>
+    <script src="phaser.min.js"></script>
+     
+    </script>
+   
+</head>
+<body>
+    <script>
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+
+            //part2 加入物理效果
+            physics:{
+                default:'arcade',
+                arcade:{
+                    gravity:{y:300},
+                    debug:false
+                }
+            },
+
+            scene: {
+                init: init,
+                preload: preload,
+                create: create,
+                update: update
+            }
+
+        };
+
+        var game = new Phaser.Game(config);
+      
+
+        function init(){
+            //console.log('Preload!');
+        }
+
+        function preload(){
+            //物件
+            this.load.image('sky','assets/sky.png');
+            this.load.image('ground','assets/platform.png'); //物件
+            this.load.image('star','assets/star.png'); //目標物
+            this.load.image('bomb','assets/bomb.png'); //增加複雜度的障礙物
+
+            //可變化的移動物件
+            this.load.spritesheet('alien','assets/dude.png',{ frameWidth:32, frameHeight: 48});
+
+
+            //聲音
+            this.load.audio('bgMusic',['assets/background.ogg','assets/background.mp3']);
+
+        }
+
+      
+
+        function create(){
+            
+            //part 1-背景
+            this.add.image(400,300,'sky');
+            
+            //part 2 加入物件
+            //part 2.1 加入平台
+            platforms = this.physics.add.staticGroup();
+            //part 2.2 加入平台上的物品
+            //platforms.create(x座標, y座標, key, frame, visible, active)
+            platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+            platforms.create(600, 400, 'ground');
+            platforms.create(50, 250, 'ground');
+            platforms.create(750, 220, 'ground');
+
+            //part 3 加入主要腳色
+            player = this.physics.add.sprite(100,450,"alien");
+
+            //part 3.1 讓他是活在"有重力的環境下"
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            this.physics.add.collider(player,platforms);
+
+            //
+
+
+            //part 1-音樂
+            var music = this.sound.add('bgMusic',{volume:0.9,loop:true});
+            music.play();
+
+            if(!this.sound.locked)
+            {
+                // already unlocked so play
+                this.music.play();
+            }
+
+            else{
+                this.sound.once(Phaser.Sound.Events.UNLOCKED,() => {
+                    this.music.play();
+                })
+            }
+   
+
+          
+          
+        }
+
+        function update(){
+
+        }
+
+   
+        
+        
+
+
+
+    </script>
+    
+
+</body>
+</html>
